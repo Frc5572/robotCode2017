@@ -25,6 +25,7 @@ void server::send(std::string data, ENetPeer* peer){
 }
 
 void runThread(int port){
+	enet_initialize();
 	ENetHost *server;
 	ENetAddress address;
 	address.host = ENET_HOST_ANY;
@@ -40,7 +41,7 @@ void runThread(int port){
 			break;
 		case ENET_EVENT_TYPE_RECEIVE:
 			if(revent != nullptr)
-				revent(talking.peer, server, talking);		
+				revent(talking.peer, server, talking);
 			break;
 		case ENET_EVENT_TYPE_DISCONNECT:
 			if(devent != nullptr)
@@ -54,13 +55,14 @@ void runThread(int port){
 	enet_deinitialize();
 }
 
-std::thread thr;
+std::thread *thr;
 
 void server::init(int port) {
-	thr = std::thread(runThread, port);
+	thr = new std::thread(runThread, port);
 }
 
 void server::quit(){
 	quitting = true;
-	thr.join();
+	thr->join();
+	delete thr;
 }
