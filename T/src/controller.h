@@ -18,18 +18,7 @@ public:
 	bool B();
 	std::pair<double, double> L();
 	std::pair<double, double> R();
-	enum pov {
-		NONE = 0,
-		NORTH,
-		NORTHEAST,
-		EAST,
-		SOUTHEAST,
-		SOUTH,
-		SOUTHWEST,
-		WEST,
-		NORTHWEST
-	};
-	pov POV();
+	unsigned POV();
 	bool start();
 	bool back();
 	bool Lbutton();

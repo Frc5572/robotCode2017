@@ -80,18 +80,8 @@ std::pair<double, double> FRC5572Controller::R() {
 	return std::make_pair(pad->GetRawAxis(RIGHT_x), pad->GetRawAxis(RIGHT_y));
 }
 
-FRC5572Controller::pov FRC5572Controller::POV() {
-	switch (pad->GetPOV(0)){
-	case 0 : return NORTH;
-	case 1 : return NORTHEAST;
-	case 2 : return EAST;
-	case 3 : return SOUTHEAST;
-	case 4 : return SOUTH;
-	case 5 : return SOUTHWEST;
-	case 6 : return WEST;
-	case 7 : return NORTHWEST;
-	default : return NONE;
-	}
+unsigned FRC5572Controller::POV() {
+	return pad->GetPOV(0) / 45;
 }
 
 bool FRC5572Controller::start() {

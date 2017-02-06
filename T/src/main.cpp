@@ -3,9 +3,11 @@
 #include <I2C.h>
 #include <stdlib.h>
 #include <sstream>
+#include <PowerDistributionPanel.h>
 #include <string>
 #include "enet.h"
 #include "controller.h"
+#include "pnuematics.h"
 #include <iostream>
 //I2C Debug Constants
 #define TRAN_DATA_SIZE 4
@@ -48,9 +50,11 @@ class Robot: public SampleRobot {
 		uint8_t Shooter_Power_Byte[REC_DATA_SIZE];
 	} Recieve_Data;
 	float maxShooterPower = 0.75f;bool sentRPM = false;
+	//Pnuematics
+	frc::Solenoid *sol;
 public:
 	Robot() :
-			driver(0), operat(1) {
+			driver(2), operat(3) {
 		drivetrain::setMotors<VictorSP>( { 0 }, { 3 });
 		m_launcher = new VictorSP(ShootVictor);
 		SmartDashboard::PutNumber("power", 0);
@@ -61,12 +65,10 @@ public:
 		server::disconnect(disconnect);
 		server::recieve(recieve);
 		server::init(25572);
+		p::init();
 		atexit(server::quit);
 	}
 	void RobotInit() override {
-	}
-	void pnuematics(){
-
 	}
 	void launcherShoot() {
 		if (operat.A()) {
@@ -84,11 +86,29 @@ public:
 			m_launcher->Set(0);
 		}
 	}
+	void putIn() {
+		if (operat.LB()) {
+			p::liftDown();
+		} else if (operat.RB()) {
+			p::liftUp();
+		}
+		if(operat.LT()){
+			p::closeGear();
+		}else if (operat.RT()){
+			p::openGear();
+		}
+		if(operat.A()){
+			p::prime();
+		} else if(operat.B()){
+			p::latch();
+		}
+		std::cout << operat.POV() << std::endl;
+	}
 	void OperatorControl() override {
 		while (IsOperatorControl() && IsEnabled()) {
 			drivetrain::drive_tank(-driver.L().first, -driver.L().second, 0.5);
 			launcherShoot();
-			pneumatics();
+			putIn();
 			Wait(0.005); // Wait 5ms for the next update.
 		}
 
@@ -129,7 +149,10 @@ public:
 		LiveWindow::GetInstance()->SetEnabled(false);
 		while (IsEnabled()) {
 			SmartDashboard::PutNumber("Distance", distance.distance);
+			driver.rumble(1,1);
+			std::cout << "loop" << std::endl;
 		}
+		driver.rumble(0,0);
 	}
 	void Disabled() override {
 	}
