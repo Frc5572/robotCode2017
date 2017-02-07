@@ -5,7 +5,7 @@
  *      Author: stem
  */
 #include <DoubleSolenoid.h>
-#include <wpilib.h>
+#include <WPILib.h>
 #include <Compressor.h>
 #include "pnuematics.h"
 #define LIFT1_DOUBLE_SOLENOID 0,7

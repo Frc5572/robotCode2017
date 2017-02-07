@@ -46,6 +46,7 @@ void runThread(string ip, int port, bool retry){
 			if(cdevent != nullptr)
 				cdevent(peer, client, talking);
 			break;
+		default: break;
 		}
 	}
 	enet_peer_reset(peer);

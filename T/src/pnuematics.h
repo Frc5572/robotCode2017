@@ -1,7 +1,7 @@
 #ifndef SRC_PNUEMATICS_H_
 #define SRC_PNUEMATICS_H_
 #include <DoubleSolenoid.h>
-#include "wpilib.h"
+#include "WPILib.h"
 namespace p {
 void init();
 void openGear();

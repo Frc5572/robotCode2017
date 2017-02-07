@@ -51,7 +51,6 @@ class Robot: public SampleRobot {
 	} Recieve_Data;
 	float maxShooterPower = 0.75f;bool sentRPM = false;
 	//Pnuematics
-	frc::Solenoid *sol;
 public:
 	Robot() :
 			driver(2), operat(3) {
