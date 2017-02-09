@@ -7,16 +7,15 @@
 #include <string>
 #include <controller.h>
 #include <iostream>
+#include <ports.h>
 
 class Robot: public SampleRobot {
 	FRC5572Controller driver;
 	FRC5572Controller operat;
-
-	//Pnuematics
 public:
 	Robot() :
 			driver(2), operat(3) {
-		drivetrain::setMotors<VictorSP>( { 0 }, { 3 });
+		drivetrain::setMotors<DRIVETRAIN_MOTOR_TYPE>( { DRIVETRAIN_MOTOR_LEFT_ID }, { DRIVETRAIN_MOTOR_RIGHT_ID });
 		//shooter::init();
 		//climber::init();
 	}

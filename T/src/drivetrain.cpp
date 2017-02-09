@@ -61,7 +61,7 @@ void drivetrain::drop_versa() {
 }
 
 void drivetrain::init() {
-	versa = new DoubleSolenoid(12, VERSA_DOUBLE_SOLENOID);
+	versa = new DoubleSolenoid(12, VERSA_DOUBLE_SOLENOID_ID);
 }
 
 void drivetrain::retract_versa() {

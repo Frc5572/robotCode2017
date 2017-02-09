@@ -5,7 +5,7 @@ frc::DoubleSolenoid *primer;
 CLIMBER_MOTOR_TYPE *climbe;
 
 void climber::init() {
-	primer = new frc::DoubleSolenoid(12, CLIMBER_DOUBLE_SOLENOID);
+	primer = new frc::DoubleSolenoid(12, CLIMBER_DOUBLE_SOLENOID_ID);
 	climbe = CLIMBER_MOTOR;
 }
 

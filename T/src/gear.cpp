@@ -16,5 +16,5 @@ void gear::stop(){
 }
 
 void gear::init(){
-	g = new DoubleSolenoid(12, GEAR_DOUBLE_SOLENOID);
+	g = new DoubleSolenoid(12, GEAR_DOUBLE_SOLENOID_ID);
 }
