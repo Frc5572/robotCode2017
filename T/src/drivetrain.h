@@ -5,6 +5,7 @@
 #include <vector>
 
 namespace drivetrain { // Robot drivetrain methods
+	void init();
 	void setMotors(std::vector<SpeedController*>, std::vector<SpeedController*>); // Set motor values
 	template <typename T>
 	void setMotors(std::vector<int> left, std::vector<int> right){
@@ -18,6 +19,8 @@ namespace drivetrain { // Robot drivetrain methods
 		setMotors(l, r);
 	}
 	void drive_tank(double, double, double); // Tank drive control
+	void drop_versa();
+	void retract_versa();
 }
 
 #endif

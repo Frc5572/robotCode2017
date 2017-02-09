@@ -1,5 +1,6 @@
 #include "drivetrain.h"
 #include <iostream>
+#include "ports.h"
 #define DEBUG 0
 std::vector<SpeedController*> motors;
 /*
@@ -51,4 +52,18 @@ void drivetrain::drive_tank(double x, double y, double amnt){ // joystick x, joy
 	}
 	if(DEBUG)
 		std::cout << motors[0]->Get() << "," << motors[1]->Get() << std::endl;
+}
+
+frc::DoubleSolenoid *versa;
+
+void drivetrain::drop_versa() {
+	versa->Set(DoubleSolenoid::kForward);
+}
+
+void drivetrain::init() {
+	versa = new DoubleSolenoid(12, VERSA_DOUBLE_SOLENOID);
+}
+
+void drivetrain::retract_versa() {
+	versa->Set(DoubleSolenoid::kReverse);
 }

@@ -11,13 +11,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-I2C *wire;
+I2C *swire;
 int packetSize = 13;
 uint8_t *i2c_buffer = new uint8_t[packetSize];
 void write_string(std::string);
 
 void Arduino::initialize() {
-	wire = new I2C(I2C::Port::kMXP, Arduino::arduinoI2Creg);
+	swire = new I2C(I2C::Port::kMXP, Arduino::arduinoI2Creg);
 	write_string("");
 }
 void Arduino::Write(std::string d) {
@@ -49,7 +49,7 @@ void Arduino::Write(int d) {
 }
 std::string Arduino::ReadData() {
 	std::stringstream ss;
-	wire->Read(Arduino::rioI2Creg, packetSize, i2c_buffer);
+	swire->Read(Arduino::rioI2Creg, packetSize, i2c_buffer);
 	for (int i = 0; i < packetSize; i++)
 		ss << i2c_buffer[i];
 	std::string s;
@@ -63,7 +63,7 @@ std::string Arduino::ReadData() {
 }
 float Arduino::ReadFloat() {
 	std::stringstream ss;
-	wire->Read(Arduino::rioI2Creg, packetSize, i2c_buffer);
+	swire->Read(Arduino::rioI2Creg, packetSize, i2c_buffer);
 	for (int i = 0; i < packetSize; i++)
 		ss << i2c_buffer[i];
 	std::string s;
@@ -81,7 +81,7 @@ float Arduino::ReadFloat() {
 }
 int Arduino::ReadInt() {
 	std::stringstream ss;
-	wire->Read(Arduino::rioI2Creg, packetSize, i2c_buffer);
+	swire->Read(Arduino::rioI2Creg, packetSize, i2c_buffer);
 	for (int i = 0; i < packetSize; i++)
 		ss << i2c_buffer[i];
 	std::string s;
@@ -101,5 +101,5 @@ void write_string(std::string m) {
 	sn[0] = Arduino::rioI2Creg;
 	for (unsigned i = 0; i < length; i++)
 		sn[i + 1] = val[i];
-	wire->WriteBulk(sn, length + 1);
+	swire->WriteBulk(sn, length + 1);
 }
