@@ -17,6 +17,8 @@ void exposure_auto();
 void white_balance_auto();
 void white_balance(int);
 void fps(int);
+void switchc();
+bool version();
 }
 
 #endif /* SRC_CAMERA_H_ */
