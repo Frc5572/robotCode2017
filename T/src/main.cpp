@@ -8,6 +8,7 @@
 #include <controller.h>
 #include <iostream>
 #include <ports.h>
+#include <intake.h>
 
 class Robot: public SampleRobot {
 	FRC5572Controller driver;
@@ -16,32 +17,32 @@ public:
 	Robot() :
 			driver(2), operat(3) {
 		drivetrain::setMotors<DRIVETRAIN_MOTOR_TYPE>( { DRIVETRAIN_MOTOR_LEFT_ID }, { DRIVETRAIN_MOTOR_RIGHT_ID });
-		//shooter::init();
-		//climber::init();
+		drivetrain::init();
+		intake::init();
+		gear::init();
+		shooter::init();
+		climber::init();
 	}
 	void RobotInit() override {
 	}
 	void OperatorControl() override {
+		drivetrain::retract_versa();
 		while (IsOperatorControl() && IsEnabled()) {
 			drivetrain::drive_tank(-driver.L().first, -driver.L().second, 0.5);
-			if (driver.A())
+			if(driver.A()){
 				drivetrain::drop_versa();
-			else if (driver.B())
+			}else if (driver.B()){
 				drivetrain::retract_versa();
-
-			/*
-			if(operat.A())
-				shooter::shoot();
+			}
+			if(driver.Y())
+				intake::intake();
 			else
-				shooter::stop();
-			//*/
+				intake::stop();
 
-			/*
 			if(driver.X())
 				climber::climb(driver.LT());
 			else
 				climber::climb(0);
-			//*/
 			Wait(0.005);
 		}
 	}

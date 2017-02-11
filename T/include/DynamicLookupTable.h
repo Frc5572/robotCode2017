@@ -12,17 +12,26 @@
 #include <utility>
 #include "tspl/bfgs.h"
 
+double lin(double a, std::vector<double> b) {
+	return b[0] * a + b[1];
+}
+
 class DynamicLookupTable {
 public:
-	DynamicLookupTable(double (*f)(double, std::vector<double>),
-			unsigned size) {
+	DynamicLookupTable(double (*f)(double, std::vector<double>) = lin,
+			unsigned size = 2, double default_ = 0.0) {
 		func = f;
-		weights.resize(size, 0.5);
+		weights.resize(size, default_);
 	}
 	~DynamicLookupTable() {
 	}
 	inline double operator()(double a) {
 		return func(a, weights);
+	}
+	inline void operator()(double (*f)(double, std::vector<double>),
+			unsigned size, double default_ = 0.5) {
+		func = f;
+		weights.resize(size, default_);
 	}
 	inline void operator()(double a, double b) {
 		data.push_back(std::make_pair(a, b));
@@ -44,7 +53,7 @@ public:
 	inline std::vector<double> w() {
 		return weights;
 	}
-	inline std::vector<std::pair<double, double> > getData(){
+	inline std::vector<std::pair<double, double> > getData() {
 		return data;
 	}
 	inline void checkZeros() {
@@ -64,7 +73,7 @@ private:
 
 std::vector<double> toVec(splab::Vector<double> a) {
 	std::vector<double> k(a.dim());
-	for (unsigned i = 0; i < a.dim(); i++)
+	for (int i = 0; i < a.dim(); i++)
 		k[i] = a[i];
 	return k;
 }
@@ -78,13 +87,13 @@ public:
 	}
 	double operator()(splab::Vector<double> a) {
 		std::vector<double> j(a.dim());
-		for (unsigned i = 0; i < a.dim(); i++)
+		for (int i = 0; i < a.dim(); i++)
 			j[i] = a[i];
 		return dlt->cost(j);
 	}
 	splab::Vector<double> grad(splab::Vector<double> a) {
 		splab::Vector<double> g(a.dim());
-		for (unsigned i = 0; i < a.dim(); i++) {
+		for (int i = 0; i < a.dim(); i++) {
 			a[i] += 0.0001;
 			double ha = dlt->cost(toVec(a));
 			a[i] -= 0.0002;
@@ -96,18 +105,19 @@ public:
 	}
 };
 
-inline void DynamicLookupTable::operator()(int maxItr, double tolerance, bool zero) {
+inline void DynamicLookupTable::operator()(int maxItr, double tolerance,
+		bool zero) {
 	objective_function obj(this);
 	splab::BFGS<double, decltype(obj)> bfgs;
 	splab::Vector<double> v(weights.size());
-	for (unsigned i = 0; i < v.dim(); i++) {
+	for (int i = 0; i < v.dim(); i++) {
 		v[i] = weights[i];
 	}
 	bfgs.optimize(obj, v, tolerance, maxItr);
-	for (unsigned i = 0; i < v.dim(); i++) {
+	for (int i = 0; i < v.dim(); i++) {
 		weights[i] = bfgs.getOptValue()[i];
 	}
-	if(zero)
+	if (zero)
 		checkZeros();
 }
 

@@ -1,7 +1,7 @@
 #include "drivetrain.h"
 #include <iostream>
 #include "ports.h"
-#define DEBUG 0
+#define DEBUG 1
 std::vector<SpeedController*> motors;
 /*
 
@@ -14,7 +14,7 @@ void drivetrain::setMotors(std::vector<SpeedController*> l, std::vector<SpeedCon
 		motors[i] = l[i];
 	}
 	for(unsigned i = 0; i < r.size(); i++){
-		motors[i+l.size()] = l[i];
+		motors[i+l.size()] = r[i];
 	}
 }
 
@@ -36,7 +36,7 @@ void drivetrain::drive_tank(double x, double y, double amnt){ // joystick x, joy
 	if(signum(x) == signum(y)){ // If in quad I or III
 		double m = y - x;
 		for(unsigned i = 0; i < motors.size() / 2; i++){
-			motors[i]->Set(m);
+			motors[i]->Set(-m);
 		}
 		for(unsigned i = motors.size() / 2; i < motors.size(); i++){
 			motors[i]->Set(d);
@@ -44,14 +44,18 @@ void drivetrain::drive_tank(double x, double y, double amnt){ // joystick x, joy
 	} else { // If in quad II or IV
 		double m = y + x;
 		for(unsigned i = 0; i < motors.size() / 2; i++){
-			motors[i]->Set(d);
+			motors[i]->Set(-d);
 		}
 		for(unsigned i = motors.size() / 2; i < motors.size(); i++){
 			motors[i]->Set(m);
 		}
 	}
-	if(DEBUG)
-		std::cout << motors[0]->Get() << "," << motors[1]->Get() << std::endl;
+	if(DEBUG){
+		for(unsigned i = 0; i < motors.size(); i++){
+			std::cout << motors[i]->Get();
+		}
+	}
+
 }
 
 frc::DoubleSolenoid *versa;

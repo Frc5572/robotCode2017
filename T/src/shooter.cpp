@@ -3,6 +3,7 @@
 #include <iostream>
 #include <enet.h>
 #include "ports.h"
+#include <DynamicLookupTable.h>
 
 union S {
 	enet_uint8 byte[sizeof(long double)];
@@ -36,8 +37,7 @@ void disconnect(ENetPeer* peer, ENetHost* host, ENetEvent event) {
 }
 
 void SendShootRPM() {
-	if (Shooter_RPM != SmartDashboard::GetNumber("RPM", 0))
-		Shooter_RPM = SmartDashboard::GetNumber("RPM", 0);
+	Shooter_RPM = distance.distance;
 	transmit_data[0] = 'S';
 	transmit_data[1] = 'T';
 	transmit_data[2] = Shooter_RPM >> 8;
@@ -77,7 +77,7 @@ void shooter::init() {
 }
 
 void shooter::shoot() {
-	if (!sentRPM || Shooter_RPM != SmartDashboard::GetNumber("RPM", 0)) {
+	if (!sentRPM) {
 		SendShootRPM();
 		sentRPM = true;
 	}
