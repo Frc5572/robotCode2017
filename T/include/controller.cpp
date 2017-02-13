@@ -24,12 +24,48 @@
 #define LEFT_STICK_BUTTON 9
 #define RIGHT_STICK_BUTTON 10
 
+bool k = false;
+
+void ct(XboxController *pad, FRC5572Controller::ButtonEvent x,
+		FRC5572Controller::ButtonEvent y, FRC5572Controller::ButtonEvent lb,
+		FRC5572Controller::ButtonEvent rb, FRC5572Controller::ButtonEvent a,
+		FRC5572Controller::ButtonEvent b) {
+	if (pad->GetRawButton(X_BUTTON)) {
+		std::thread m(x);
+		m.detach();
+	}
+	if (pad->GetRawButton(Y_BUTTON)) {
+		std::thread m(y);
+		m.detach();
+	}
+	if (pad->GetRawButton(A_BUTTON)) {
+		std::thread m(a);
+		m.detach();
+	}
+	if (pad->GetRawButton(B_BUTTON)) {
+		std::thread m(b);
+		m.detach();
+	}
+	if (pad->GetRawButton(LEFT_BUTTON)) {
+		std::thread m(lb);
+		m.detach();
+	}
+	if (pad->GetRawButton(RIGHT_BUTTON)) {
+		std::thread m(rb);
+		m.detach();
+	}
+}
+
 FRC5572Controller::FRC5572Controller(int I) {
 	pad = new XboxController(I);
 }
 
 FRC5572Controller::~FRC5572Controller() {
 	delete pad;
+	if (!k) {
+		k = true;
+		s.join();
+	}
 }
 
 double FRC5572Controller::LT() {
@@ -103,4 +139,8 @@ bool FRC5572Controller::Rbutton() {
 void FRC5572Controller::rumble(double x, double y) {
 	pad->SetRumble(GenericHID::kLeftRumble, x);
 	pad->SetRumble(GenericHID::kRightRumble, y);
+}
+
+void FRC5572Controller::runEvents() {
+	ct(pad, x, y, lb, rb, a, b);
 }

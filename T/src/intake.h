@@ -5,7 +5,6 @@ namespace intake {
 void init();
 void intake();
 void stop();
-void agitate();
 }
 
 #endif
