@@ -22,7 +22,7 @@ public:
 		gear::init();
 		shooter::init();
 		//climber::init();
-		//camera::init();
+		camera::init();
 	}
 	void RobotInit() override {
 	}
@@ -57,7 +57,7 @@ public:
 			//	climber::climb(driver.LT());
 			//else
 			//	climber::climb(0);
-			//Wait(0.005);
+			Wait(0.005);
 			//if(operat.A() && camera::version()){
 			//	camera::switchc();
 			//} else if(operat.B() && !camera::version()){

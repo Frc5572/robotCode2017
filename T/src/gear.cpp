@@ -7,10 +7,10 @@ frc::DoubleSolenoid *g;
 frc::Compressor *c;
 
 void gear::close(){
-	g->Set(DoubleSolenoid::kReverse);
+	g->Set(DoubleSolenoid::kForward);
 }
 void gear::open(){
-	g->Set(DoubleSolenoid::kForward);
+	g->Set(DoubleSolenoid::kReverse);
 }
 void gear::stop(){
 	g->Set(DoubleSolenoid::kOff);

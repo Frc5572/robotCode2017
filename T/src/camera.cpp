@@ -12,12 +12,20 @@ cs::CvSource outputStream;
 volatile bool frontorback = false;
 
 void mt() {
+	//uc = frc::CameraServer::GetInstance()->StartAutomaticCapture();
+	//bc = frc::CameraServer::GetInstance()->StartAutomaticCapture();
+
 	bc = cs::UsbCamera("a", 0);
 	uc = cs::UsbCamera("b", 1);
 	outputStream = frc::CameraServer::GetInstance()->PutVideo(
 			"DriveStationVideo", 640, 480);
 	cs::CvSink front = frc::CameraServer::GetInstance()->GetVideo(uc);
 	cs::CvSink back = frc::CameraServer::GetInstance()->GetVideo(bc);
+
+	bc.SetExposureAuto();
+	uc.SetExposureAuto();
+	bc.SetWhiteBalanceAuto();
+	uc.SetWhiteBalanceAuto();
 	cv::Mat mat;
 	while (true) {
 		if (!frontorback) {
@@ -30,7 +38,7 @@ void mt() {
 		} else {
 			if (back.GrabFrame(mat) == 0) {
 				// Send the output the error.
-				outputStream.NotifyError(front.GetError());
+				outputStream.NotifyError(back.GetError());
 				// skip the rest of the current iteration
 				continue;
 			}

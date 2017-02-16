@@ -35,6 +35,7 @@ void connect(ENetPeer* peer, ENetHost* host, ENetEvent event) {
 void recieve(ENetPeer* peer, ENetHost* host, ENetEvent event) {
 	for (unsigned int i = 0; i < sizeof(long double); i++)
 		distance.byte[i] = event.packet->data[i];
+	SmartDashboard::PutNumber("distance", distance.distance);
 	std::cout << distance.distance << std::endl;
 	server::send("", peer);
 }
