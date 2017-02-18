@@ -9,7 +9,7 @@ void intake::init() {
 }
 
 void intake::intake() {
-	m_intake->Set(0.6);
+	m_intake->Set(0.8);
 }
 
 void intake::stop() {

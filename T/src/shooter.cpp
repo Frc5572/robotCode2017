@@ -24,7 +24,7 @@ SHOOTER_PRIME_MOTOR_TYPE *m_primer;
 I2C* wire;
 char code[2];
 
-long Shooter_RPM = 0; //Speed i want
+long Shooter_RPM = 0;
 unsigned char transmit_data[ARDUINO_TRAN_DATA_SIZE];
 bool sentRPM = false;
 
@@ -36,7 +36,7 @@ void recieve(ENetPeer* peer, ENetHost* host, ENetEvent event) {
 	for (unsigned int i = 0; i < sizeof(long double); i++)
 		distance.byte[i] = event.packet->data[i];
 	SmartDashboard::PutNumber("distance", distance.distance);
-	std::cout << distance.distance << std::endl;
+	//std::cout << distance.distance << std::endl;
 	server::send("", peer);
 }
 void disconnect(ENetPeer* peer, ENetHost* host, ENetEvent event) {
@@ -97,6 +97,7 @@ void shooter::init() {
 
 Timer timer;
 bool started = false;
+bool agitate_flag = false;
 
 void shooter::shoot() {
 	if (!sentRPM) {
@@ -111,7 +112,11 @@ void shooter::shoot() {
 		}
 		if (timer.Get() * 2 - floor(timer.Get() * 2) > 0.5){
 			m_primer->Set(0.4);
-			m_agitator->Set(frc::Relay::kOn);
+			if(agitate_flag)
+				m_agitator->Set(frc::Relay::kOn);
+			else
+				m_agitator->Set(frc::Relay::kOff);
+			agitate_flag = !agitate_flag;
 		}
 		else{
 			m_agitator->Set(frc::Relay::kOff);

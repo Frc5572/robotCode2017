@@ -35,8 +35,8 @@ double max(double m, double n) {
 
  */
 void drivetrain::drive_tank(double x, double y, double amnt) { // joystick x, joystick y, scaling modifier
-	x /= amnt; // Scale
-	y /= amnt; // Scale
+	x *= amnt; // Scale
+	y *= amnt; // Scale
 	x = signum(x) * (x * x); // Square, retain sign
 	y = signum(y) * (y * y); // Square, retain sign
 	double d = signum(y) * max(y * signum(y), x * signum(x));

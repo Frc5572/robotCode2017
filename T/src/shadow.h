@@ -1,12 +1,16 @@
 #ifndef SRC_SHADOW_H_
 #define SRC_SHADOW_H_
 
-class shadow {
-public:
-	shadow(double);
-	~shadow();
-private:
-	double m_interval;
-};
+#include <RobotBase.h>
+
+namespace shadow {
+void init();
+void dtwrite(double, double, double);
+void swrite(bool);
+void gwrite(bool);
+void start();
+void stop();
+void run(RobotBase*);
+}
 
 #endif

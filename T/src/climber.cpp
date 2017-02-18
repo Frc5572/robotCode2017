@@ -5,8 +5,9 @@ frc::DoubleSolenoid *primer;
 CLIMBER_MOTOR_TYPE *climbe;
 
 void climber::init() {
-	primer = new frc::DoubleSolenoid(12, CLIMBER_DOUBLE_SOLENOID_ID);
+	//primer = new frc::DoubleSolenoid(12, CLIMBER_DOUBLE_SOLENOID_ID);
 	climbe = CLIMBER_MOTOR;
+	//primer->Set(frc::DoubleSolenoid::kForward);
 }
 
 void climber::prime() {
@@ -18,5 +19,5 @@ void climber::reset() {
 }
 
 void climber::climb(double a) {
-
+	climbe->Set(a);
 }

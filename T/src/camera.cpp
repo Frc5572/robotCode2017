@@ -17,11 +17,11 @@ void mt() {
 
 	bc = cs::UsbCamera("a", 0);
 	uc = cs::UsbCamera("b", 1);
+	//camera::resolution(320, 240);
 	outputStream = frc::CameraServer::GetInstance()->PutVideo(
 			"DriveStationVideo", 640, 480);
 	cs::CvSink front = frc::CameraServer::GetInstance()->GetVideo(uc);
 	cs::CvSink back = frc::CameraServer::GetInstance()->GetVideo(bc);
-
 	bc.SetExposureAuto();
 	uc.SetExposureAuto();
 	bc.SetWhiteBalanceAuto();

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <ports.h>
 #include <intake.h>
+#include <shadow.h>
 
 class Robot: public SampleRobot {
 	FRC5572Controller driver;
@@ -21,54 +22,51 @@ public:
 		intake::init();
 		gear::init();
 		shooter::init();
-		//climber::init();
+		climber::init();
 		camera::init();
+		shadow::init();
 	}
 	void RobotInit() override {
 	}
 	void OperatorControl() override {
 		drivetrain::retract_versa();
 		while (IsOperatorControl() && IsEnabled()) {
-			drivetrain::drive_lr(-driver.L().second, -driver.R().second, 0.30);
+			shadow::dtwrite(-driver.L().second, -driver.R().second, 0.30);
 			if(driver.A()) {
 				drivetrain::drop_versa();
 			} else if (driver.B()) {
 				drivetrain::retract_versa();
 			}
-			if(driver.Y()) {
-				gear::open();
-			} else {
-				gear::close();
-			}
-			bool stop = true;
-			if(driver.LB()){
+			shadow::gwrite(driver.Y());
+			if(driver.RB())
 				intake::intake();
-				stop = false;
-			}
-			if(driver.X()){
-				shooter::shoot();
-				stop = false;
-			}else{
-				shooter::stop();
-			}
-			if(stop)
+			else
 				intake::stop();
-			//if(driver.X())
-			//	climber::climb(driver.LT());
-			//else
-			//	climber::climb(0);
+			shadow::swrite(driver.X());
+			if(driver.LB())
+				climber::climb(driver.LT());
+			else
+				climber::climb(0);
 			Wait(0.005);
-			//if(operat.A() && camera::version()){
-			//	camera::switchc();
-			//} else if(operat.B() && !camera::version()){
-			//	camera::switchc();
-			//}
+			if(operat.A() && camera::version()){
+				camera::switchc();
+			} else if(operat.B() && !camera::version()){
+				camera::switchc();
+			}
 			//std::cout << camera::version() << std::endl;
 		}
 	}
 	void Autonomous() {
+		shadow::run(this);
 	}
 	void Test() override {
+		shadow::start();
+		while(IsTest() && IsEnabled()){
+			shadow::dtwrite(-driver.L().second, -driver.R().second, 0.30);
+			shadow::gwrite(driver.Y());
+			shadow::swrite(driver.X());
+		}
+		shadow::stop();
 	}
 	void Disabled() override {
 	}
