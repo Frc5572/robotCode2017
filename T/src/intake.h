@@ -3,7 +3,7 @@
 
 namespace intake {
 void init();
-void intake();
+void intake(double);
 void stop();
 }
 

@@ -29,31 +29,43 @@ public:
 	void RobotInit() override {
 	}
 	void OperatorControl() override {
-		drivetrain::retract_versa();
+		drivetrain::drop_versa();
+		bool m = false;
 		while (IsOperatorControl() && IsEnabled()) {
-			shadow::dtwrite(-driver.L().second, -driver.R().second, 0.30);
-			if(driver.A()) {
+			std::cout << "a" << std::endl;
+			shadow::dtwrite(-driver.L().second, -driver.R().second, 0.80);
+			std::cout << "b" << std::endl;
+			shadow::gwrite(operat.LT() > .1);
+			std::cout << "c" << std::endl;
+			shadow::swrite(operat.RT() > .1);
+			std::cout << "d" << std::endl;
+
+			//Versa
+			if(driver.LT())
 				drivetrain::drop_versa();
-			} else if (driver.B()) {
+			else if(driver.LB())
 				drivetrain::retract_versa();
-			}
-			shadow::gwrite(driver.Y());
+
+			//Climber
+			std::cout << "e" << std::endl;
+			climber::climb(driver.RT());
 			if(driver.RB())
-				intake::intake();
+				climber::prime();
 			else
-				intake::stop();
-			shadow::swrite(driver.X());
-			if(driver.LB())
-				climber::climb(driver.LT());
-			else
-				climber::climb(0);
-			Wait(0.005);
-			if(operat.A() && camera::version()){
+				climber::reset();
+
+			// Intake
+			intake::intake(operat.L().second);
+
+			//Camera
+			if(driver.Y() && !m){
 				camera::switchc();
-			} else if(operat.B() && !camera::version()){
-				camera::switchc();
+				m = true;
 			}
-			//std::cout << camera::version() << std::endl;
+			if(!driver.Y())
+				m = false;
+
+			Wait(0.005); // Motor timeout
 		}
 	}
 	void Autonomous() {

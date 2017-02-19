@@ -12,6 +12,10 @@
 #include <utility>
 #include "tspl/bfgs.h"
 
+int get_uniquity(double m){
+	return 0;
+}
+
 double lin(double a, std::vector<double> b) {
 	return b[0] * a + b[1];
 }

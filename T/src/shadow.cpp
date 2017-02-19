@@ -39,7 +39,7 @@ void shadow::init() {
 }
 
 void shadow::dtwrite(double a, double b, double c) {
-	drivetrain::drive_tank(a, b, c);
+	drivetrain::drive_lr(a, b, c);
 	if (writing) {
 		write(fd, (const void*) DT_ID, 1);
 		write(fd, dtob(clock_.Get()), sizeof(clock_.Get()));

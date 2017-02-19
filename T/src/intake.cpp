@@ -8,8 +8,8 @@ void intake::init() {
 	m_intake = INTAKE_MOTOR;
 }
 
-void intake::intake() {
-	m_intake->Set(0.8);
+void intake::intake(double m) {
+	m_intake->Set(m);
 }
 
 void intake::stop() {
