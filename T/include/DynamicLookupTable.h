@@ -11,9 +11,42 @@
 #include <vector>
 #include <utility>
 #include "tspl/bfgs.h"
+#include <cmath>
 
-int get_uniquity(double m){
-	return 0;
+long gcd(long a, long b) {
+	if (a == 0)
+		return b;
+	else if (b == 0)
+		return a;
+
+	if (a < b)
+		return gcd(a, b % a);
+	else
+		return gcd(b, a % b);
+}
+
+int get_uniquity(double x, double error = .000001) {
+	long numerator = 0, denominator = 1;
+	{
+		double integral = floor(x);
+		double frac = x - integral;
+
+		const long precision = 1000000000; // This is the accuracy.
+
+		long gcd_ = gcd(round(frac * precision), precision);
+
+		denominator = precision / gcd_;
+		numerator = round(frac * precision) / gcd_;
+		numerator += denominator * integral;
+	}
+	return numerator + denominator * denominator;
+}
+
+int get_uniquity(std::vector<double> a, double error = 0.000001){
+	int m = 0;
+	for(unsigned i = 0; i < a.size(); i++)
+		m += get_uniquity(a[i], error);
+	return m;
 }
 
 double lin(double a, std::vector<double> b) {
@@ -23,9 +56,10 @@ double lin(double a, std::vector<double> b) {
 class DynamicLookupTable {
 public:
 	DynamicLookupTable(double (*f)(double, std::vector<double>) = lin,
-			unsigned size = 2, double default_ = 0.0) {
+			unsigned size = 2, double default_ = 0.0, double lambda = 0.1) {
 		func = f;
 		weights.resize(size, default_);
+		this->lambda = lambda;
 	}
 	~DynamicLookupTable() {
 	}
@@ -48,7 +82,7 @@ public:
 			double y = ((data[i].second));
 			m += ((y - yhat) * (y - yhat)) / 2.0;
 		}
-		return m;
+		return m + lambda * get_uniquity(weights);
 	}
 	inline double cost(std::vector<double> a) {
 		weights = a;
@@ -73,6 +107,7 @@ private:
 	std::vector<std::pair<double, double> > data;
 	double (*func)(double, std::vector<double>);
 	std::vector<double> weights;
+	double lambda;
 };
 
 std::vector<double> toVec(splab::Vector<double> a) {

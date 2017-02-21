@@ -32,22 +32,17 @@ public:
 		drivetrain::drop_versa();
 		bool m = false;
 		while (IsOperatorControl() && IsEnabled()) {
-			std::cout << "a" << std::endl;
-			shadow::dtwrite(-driver.L().second, -driver.R().second, 0.80);
-			std::cout << "b" << std::endl;
+			shadow::dtwrite(-driver.L().second, -driver.R().second, .5 + (driver.LT() * .5));
 			shadow::gwrite(operat.LT() > .1);
-			std::cout << "c" << std::endl;
 			shadow::swrite(operat.RT() > .1);
-			std::cout << "d" << std::endl;
 
 			//Versa
-			if(driver.LT())
+			if(driver.A())
 				drivetrain::drop_versa();
-			else if(driver.LB())
+			else if(driver.B())
 				drivetrain::retract_versa();
 
 			//Climber
-			std::cout << "e" << std::endl;
 			climber::climb(driver.RT());
 			if(driver.RB())
 				climber::prime();
@@ -55,7 +50,10 @@ public:
 				climber::reset();
 
 			// Intake
-			intake::intake(operat.L().second);
+			if(operat.A())
+				intake::intake(.7);
+			else
+				intake::intake(0);
 
 			//Camera
 			if(driver.Y() && !m){
@@ -69,7 +67,9 @@ public:
 		}
 	}
 	void Autonomous() {
-		shadow::run(this);
+		drivetrain::retract_versa();
+		//shadow::run(this);
+		autonomous::auto1(this);
 	}
 	void Test() override {
 		shadow::start();

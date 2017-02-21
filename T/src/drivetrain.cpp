@@ -71,10 +71,12 @@ void drivetrain::init() {
 }
 
 void drivetrain::drive_lr(double l, double r, double amnt) {
-	l *= amnt; // Scale
-	r *= amnt; // Scale
-	l = signum(l) * (l * l); // Square, retain sign
-	r = signum(r) * (r * r); // Square, retain sign
+	if (amnt > 0) {
+		l *= amnt; // Scale
+		r *= amnt; // Scale
+		l = signum(l) * (l * l); // Square, retain sign
+		r = signum(r) * (r * r); // Square, retain sign
+	}
 	for (unsigned i = 0; i < motors.size() / 2; i++) {
 		motors[i]->Set(-l);
 	}

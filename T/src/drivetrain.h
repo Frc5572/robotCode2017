@@ -19,7 +19,7 @@ namespace drivetrain { // Robot drivetrain methods
 		setMotors(l, r);
 	}
 	void drive_tank(double, double, double); // Tank drive control
-	void drive_lr(double, double, double); // Tank drive control
+	void drive_lr(double, double, double = 1); // Left-Right drive control
 	void drop_versa();
 	void retract_versa();
 }

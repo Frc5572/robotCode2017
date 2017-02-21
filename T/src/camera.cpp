@@ -22,10 +22,6 @@ void mt() {
 			"DriveStationVideo", 640, 480);
 	cs::CvSink front = frc::CameraServer::GetInstance()->GetVideo(uc);
 	cs::CvSink back = frc::CameraServer::GetInstance()->GetVideo(bc);
-	bc.SetExposureAuto();
-	uc.SetExposureAuto();
-	bc.SetWhiteBalanceAuto();
-	uc.SetWhiteBalanceAuto();
 	cv::Mat mat;
 	while (true) {
 		if (!frontorback) {
