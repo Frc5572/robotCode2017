@@ -14,8 +14,8 @@
 #define TWOVAR
 
 union S {
-	enet_uint8 byte[sizeof(long double)];
-	long double distance;
+	enet_uint8 byte[2*sizeof(unsigned int)];
+	unsigned int distance[2];
 };
 
 volatile S distance;
@@ -58,7 +58,7 @@ void connect(ENetPeer* peer, ENetHost* host, ENetEvent event) {
 void recieve(ENetPeer* peer, ENetHost* host, ENetEvent event) {
 	for (unsigned int i = 0; i < sizeof(long double); i++)
 		distance.byte[i] = event.packet->data[i];
-	SmartDashboard::PutNumber("distance", distance.distance);
+	SmartDashboard::PutNumber("distance", (double)distance.distance[0]);
 	//std::cout << distance.distance << std::endl;
 	server::send("", peer);
 }
@@ -170,7 +170,7 @@ void shooter::init() {
 	server::init(25572);
 	atexit(server::quit);
 	Recieve_DataR.Double = 0;
-	distance.distance = 114.5;
+	distance.distance[0] = 114.5;
 	SmartDashboard::PutNumber("rpms",14000.0);
 	SmartDashboard::PutNumber("distance", 0.0);
 }
@@ -332,7 +332,7 @@ void autonomous::auto5(RobotBase *rb) {
 	while ((code[0] != 'O' || code[1] != 'O') && rb->IsEnabled()
 			&& rb->IsAutonomous())
 		ReadI2C(false);
-	Start('A', '4');
+	Start('A', '5');
 	while (rb->IsEnabled() && rb->IsAutonomous()) {
 		ReadI2C(false);
 		SmartDashboard::PutNumber("LeftPower", Recieve_DataL.Double);
