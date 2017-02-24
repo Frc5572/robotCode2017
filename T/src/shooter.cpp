@@ -8,6 +8,8 @@
 #include <Timer.h>
 #include <drivetrain.h>
 #include <gear.h>
+#include <iostream>
+#include <cstdlib>
 
 #define TWOVAR
 
@@ -70,16 +72,26 @@ void SendShootRPM() {
 	Shooter_RPM = SmartDashboard::GetNumber("rpms", 0);
 	transmit_data[0] = 'S';
 	transmit_data[1] = 'H';
+	wire->WriteBulk(transmit_data, ARDUINO_TRAN_DATA_SIZE);
 	transmit_data[2] = Shooter_RPM >> 8;
 	transmit_data[3] = Shooter_RPM;
 	std::cout << "Sending rpms" << transmit_data << std::endl;
 	wire->WriteBulk(transmit_data, ARDUINO_TRAN_DATA_SIZE);
 }
+
 void StopShootRPMCycle() {
 	transmit_data[0] = 'S';
 	transmit_data[1] = 'T';
 	transmit_data[2] = 0;
 	transmit_data[3] = 0;
+	wire->WriteBulk(transmit_data, ARDUINO_TRAN_DATA_SIZE);
+}
+
+void Start(char a, char b, char c = 0, char d = 0) {
+	transmit_data[0] = a;
+	transmit_data[1] = b;
+	transmit_data[2] = c;
+	transmit_data[3] = d;
 	wire->WriteBulk(transmit_data, ARDUINO_TRAN_DATA_SIZE);
 }
 
@@ -90,10 +102,11 @@ float ReadI2C(bool m
 	) {
 #endif
 	uint8_t data[ARDUINO_REC_DATA_SIZE];
-	for(unsigned i = 0; i < ARDUINO_REC_DATA_SIZE; i++)
+	for (unsigned i = 0; i < ARDUINO_REC_DATA_SIZE; i++)
 		data[i] = 0;
 	wire->ReadOnly(ARDUINO_REC_DATA_SIZE, data);
-	std::cout << "recieved:" << data << std::endl;
+	if (data[0] != 0)
+		std::cout << "recieved:" << data << std::endl;
 #ifdef TWOVAR
 	if (k) {
 		code2[0] = data[0];
@@ -138,6 +151,7 @@ float ReadI2C(bool m
 #endif
 		SmartDashboard::PutString("Code", code);
 	SmartDashboard::PutNumber("Time", Timer::GetMatchTime());
+	usleep(1000);
 #ifdef TWOVAR
 	return Power.Double;
 #else
@@ -157,7 +171,7 @@ void shooter::init() {
 	atexit(server::quit);
 	Recieve_DataR.Double = 0;
 	distance.distance = 114.5;
-	SmartDashboard::PutNumber("rpms", 20000.0);
+	SmartDashboard::PutNumber("rpms",14000.0);
 	SmartDashboard::PutNumber("distance", 0.0);
 }
 
@@ -204,12 +218,65 @@ void shooter::stop() {
 }
 
 void autonomous::auto1(RobotBase *rb) {
+	StopShootRPMCycle();
 	gear::close();
-	transmit_data[0] = 'A';
-	transmit_data[1] = '1';
-	transmit_data[2]=0;
-	transmit_data[3]=0;
-	wire->WriteBulk(transmit_data, ARDUINO_TRAN_DATA_SIZE);
+	while ((code[0] != 'O' || code[1] != 'O') && rb->IsEnabled()
+			&& rb->IsAutonomous())
+		ReadI2C(false); // Wait until we get OO
+	Start('A', '1'); // Send A1
+	while (rb->IsEnabled() && rb->IsAutonomous()) {
+		ReadI2C(false); // Get Drivetrain Power values
+		SmartDashboard::PutNumber("LeftPower", Recieve_DataL.Double);
+		SmartDashboard::PutNumber("RightPower", Recieve_DataR.Double);
+		SmartDashboard::PutString("Code", code);
+		if (code[0] == 'T' && code[1] == 'R') // If reached target
+			break;
+		if (code[0] == 'E' && code[1] == 'N') { // If recieved encoder values
+			drivetrain::drive_lr((double) Recieve_DataL.Double,
+					(double) Recieve_DataR.Double, -1.0); // Drive with raw values
+		} else {
+			drivetrain::drive_lr(0, 0, -1); // Don't do anything
+		}
+	}
+	std::cout << "finished" << std::endl;
+	StopShootRPMCycle(); // Send ST
+	drivetrain::drive_lr(0, 0, -1); //Stop moving
+}
+
+void autonomous::auto2(RobotBase *rb) {
+	StopShootRPMCycle();
+	drivetrain::drop_versa();
+	while ((code[0] != 'O' || code[1] != 'O') && rb->IsEnabled()
+			&& rb->IsAutonomous())
+		ReadI2C(false);
+	Start('A', '2');
+	while (rb->IsEnabled() && rb->IsAutonomous()) {
+		ReadI2C(false);
+		SmartDashboard::PutNumber("LeftPower", Recieve_DataL.Double);
+		SmartDashboard::PutNumber("RightPower", Recieve_DataR.Double);
+		SmartDashboard::PutString("Code", code);
+		if (code[0] == 'R' && code[1] == 'R')
+			break;
+		if (code[0] == 'G' && code[1] == 'Y') {
+			drivetrain::drive_lr((double) Recieve_DataL.Double,
+					(double) Recieve_DataR.Double, -1.0);
+		} else {
+			drivetrain::drive_lr(0, 0, -1);
+		}
+	}
+	std::cout << "finished" << std::endl;
+	StopShootRPMCycle();
+	drivetrain::drive_lr((double) 0, (double) 0, -1.0);
+}
+
+void autonomous::auto3(RobotBase* rb) {
+	drivetrain::retract_versa();
+	StopShootRPMCycle();
+	while ((code[0] != 'O' || code[1] != 'O') && rb->IsEnabled()
+			&& rb->IsAutonomous())
+		ReadI2C(false);
+	gear::close();
+	Start('A', '3');
 	while (rb->IsEnabled() && rb->IsAutonomous()) {
 		ReadI2C(false);
 		SmartDashboard::PutNumber("LeftPower", Recieve_DataL.Double);
@@ -226,22 +293,69 @@ void autonomous::auto1(RobotBase *rb) {
 	}
 	std::cout << "finished" << std::endl;
 	StopShootRPMCycle();
+	//gear::open();
+	//Wait(0.5);
+	//drivetrain::drive_lr(0.4, 0.4, -1);
+	//Wait(0.5);
+	drivetrain::drive_lr(0, 0, -1);
+}
+
+void autonomous::auto4(RobotBase *rb) {
+	StopShootRPMCycle();
+	drivetrain::drop_versa();
+	while ((code[0] != 'O' || code[1] != 'O') && rb->IsEnabled()
+			&& rb->IsAutonomous())
+		ReadI2C(false);
+	Start('A', '4');
+	while (rb->IsEnabled() && rb->IsAutonomous()) {
+		ReadI2C(false);
+		SmartDashboard::PutNumber("LeftPower", Recieve_DataL.Double);
+		SmartDashboard::PutNumber("RightPower", Recieve_DataR.Double);
+		SmartDashboard::PutString("Code", code);
+		if (code[0] == 'R' && code[1] == 'R')
+			break;
+		if (code[0] == 'G' && code[1] == 'Y') {
+			drivetrain::drive_lr((double) Recieve_DataL.Double,
+					(double) Recieve_DataR.Double, -1.0);
+		} else {
+			drivetrain::drive_lr(0, 0, -1);
+		}
+	}
+	std::cout << "finished" << std::endl;
+	StopShootRPMCycle();
+	drivetrain::drive_lr((double) 0, (double) 0, -1.0);
+}
+
+void autonomous::auto5(RobotBase *rb) {
+	StopShootRPMCycle();
+	drivetrain::drop_versa();
+	while ((code[0] != 'O' || code[1] != 'O') && rb->IsEnabled()
+			&& rb->IsAutonomous())
+		ReadI2C(false);
+	Start('A', '4');
+	while (rb->IsEnabled() && rb->IsAutonomous()) {
+		ReadI2C(false);
+		SmartDashboard::PutNumber("LeftPower", Recieve_DataL.Double);
+		SmartDashboard::PutNumber("RightPower", Recieve_DataR.Double);
+		SmartDashboard::PutString("Code", code);
+		if (code[0] == 'R' && code[1] == 'R')
+			break;
+		if (code[0] == 'G' && code[1] == 'Y') {
+			drivetrain::drive_lr((double) Recieve_DataL.Double,
+					(double) Recieve_DataR.Double, -1.0);
+		} else {
+			drivetrain::drive_lr(0, 0, -1);
+		}
+	}
+	std::cout << "finished" << std::endl;
+	StopShootRPMCycle();
+	drivetrain::drive_lr((double) 0, (double) 0, -1.0);
+}
+
+void autonomous::disengage() {
 	gear::open();
 	Wait(0.5);
 	drivetrain::drive_lr(0.4, 0.4, -1);
 	Wait(0.5);
 	drivetrain::drive_lr(0, 0, -1);
-	drivetrain::drive_lr((double) 0, (double) 0, -1.0);
-}
-
-void autonomous::auto2(RobotBase *rb) {
-	transmit_data[0] = 'A';
-	transmit_data[1] = '2';
-	wire->WriteBulk(transmit_data, ARDUINO_TRAN_DATA_SIZE);
-	while (rb->IsEnabled() && rb->IsAutonomous()) {
-
-	}
-	transmit_data[0] = 'S';
-	transmit_data[1] = 'T';
-	wire->WriteBulk(transmit_data, ARDUINO_TRAN_DATA_SIZE);
 }

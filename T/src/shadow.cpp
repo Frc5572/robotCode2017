@@ -12,9 +12,30 @@
 #include <Timer.h>
 #include <iostream>
 #include <stdlib.h>
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <array>
+
+std::string exec(const char* cmd) {
+	std::array<char, 128> buffer;
+	std::string result;
+	std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+	if (!pipe)
+		throw std::runtime_error("popen() failed!");
+	while (!feof(pipe.get())) {
+		if (fgets(buffer.data(), 128, pipe.get()) != NULL)
+			result += buffer.data();
+	}
+	return result;
+}
+
 #define DT_ID	0b001
 #define S_ID	0b010
 #define G_ID	0b100
+#define V_ID	0b011
 //Id->Timestamp->Value
 int fd;
 bool writing;
@@ -34,7 +55,9 @@ void quit() {
 }
 
 void shadow::init() {
+	std::cout << "pwd:" << exec("pwd") << std::endl;
 	fd = open("shadow.dat", O_RDWR);
+	std::cout << "fd:" << fd << std::endl;
 	atexit(quit);
 }
 
@@ -83,6 +106,19 @@ void shadow::stop() {
 	clock_.Stop();
 	writing = false;
 }
+
+void shadow::vwrite(bool b) {
+	if (b)
+		drivetrain::retract_versa();
+	else
+		drivetrain::drop_versa();
+	if (writing) {
+		write(fd, (const void*) V_ID, 1);
+		write(fd, dtob(clock_.Get()), sizeof(clock_.Get()));
+		write(fd, (const void*) (b), sizeof(bool));
+	}
+}
+
 void shadow::run(RobotBase *rb) {
 	Timer v;
 	v.Start();
@@ -90,9 +126,10 @@ void shadow::run(RobotBase *rb) {
 		uint8_t type;
 		read(fd, &type, 1);
 		double timestamp;
-		read(fd, &timestamp, sizeof(double));
+		read(fd, &timestamp, sizeof(v.Get()));
 		while (v.Get() < timestamp)
-			;
+			std::cout << "waiting, current:" << v.Get() << ", target:" << timestamp << std::endl;
+		std::cout << type << std::endl;
 		if (type == DT_ID) {
 			double a, b, c;
 			read(fd, &a, sizeof(double));
@@ -107,6 +144,13 @@ void shadow::run(RobotBase *rb) {
 			} else {
 				shooter::stop();
 			}
+		} else if (type == V_ID) {
+			bool b;
+			read(fd, &b, sizeof(bool));
+			if (b)
+				drivetrain::retract_versa();
+			else
+				drivetrain::drop_versa();
 		} else if (type == G_ID) {
 			bool b;
 			read(fd, &b, sizeof(bool));

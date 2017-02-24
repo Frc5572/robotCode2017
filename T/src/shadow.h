@@ -7,6 +7,7 @@ namespace shadow {
 void init();
 void dtwrite(double, double, double);
 void swrite(bool);
+void vwrite(bool);
 void gwrite(bool);
 void start();
 void stop();
