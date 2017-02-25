@@ -11,11 +11,11 @@ void climber::init() {
 }
 
 void climber::prime() {
-	primer->Set(frc::DoubleSolenoid::kForward);
+	primer->Set(frc::DoubleSolenoid::kReverse);
 }
 
 void climber::reset() {
-	primer->Set(frc::DoubleSolenoid::kReverse);
+	primer->Set(frc::DoubleSolenoid::kForward);
 }
 
 void climber::climb(double a) {

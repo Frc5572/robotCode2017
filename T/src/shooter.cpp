@@ -14,7 +14,7 @@
 #define TWOVAR
 
 union S {
-	enet_uint8 byte[2*sizeof(unsigned int)];
+	enet_uint8 byte[2 * sizeof(unsigned int)];
 	unsigned int distance[2];
 };
 
@@ -58,7 +58,7 @@ void connect(ENetPeer* peer, ENetHost* host, ENetEvent event) {
 void recieve(ENetPeer* peer, ENetHost* host, ENetEvent event) {
 	for (unsigned int i = 0; i < sizeof(long double); i++)
 		distance.byte[i] = event.packet->data[i];
-	SmartDashboard::PutNumber("distance", (double)distance.distance[0]);
+	//SmartDashboard::PutNumber("distance", distance.distance[0]);
 	//std::cout << distance.distance << std::endl;
 	server::send("", peer);
 }
@@ -170,8 +170,9 @@ void shooter::init() {
 	server::init(25572);
 	atexit(server::quit);
 	Recieve_DataR.Double = 0;
-	distance.distance[0] = 114.5;
-	SmartDashboard::PutNumber("rpms",14000.0);
+	distance.distance[0] = 114;
+	if (SmartDashboard::GetNumber("rpms", -1) == -1)
+		SmartDashboard::PutNumber("rpms", 14000.0);
 	SmartDashboard::PutNumber("distance", 0.0);
 }
 
@@ -354,8 +355,15 @@ void autonomous::auto5(RobotBase *rb) {
 
 void autonomous::disengage() {
 	gear::open();
-	Wait(0.5);
+	m_launcher->Set(-.8);
+	Wait(0.3);
 	drivetrain::drive_lr(0.4, 0.4, -1);
-	Wait(0.5);
+	Wait(0.1);
+	drivetrain::drive_lr(0.5, 0.5, -1);
+	Wait(0.1);
+	drivetrain::drive_lr(0.6, 0.6, -1);
+	Wait(0.1);
+	drivetrain::drive_lr(0.8, 0.8, -1);
+	Wait(0.6);
 	drivetrain::drive_lr(0, 0, -1);
 }

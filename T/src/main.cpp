@@ -45,7 +45,7 @@ public:
 	void OperatorControl() override {
 		drivetrain::drop_versa();
 		while (IsOperatorControl() && IsEnabled()) {
-			shadow::dtwrite(-driver.L().second, -driver.R().second, .5 + (driver.LT() * .5));
+			shadow::dtwrite(-driver.L().second, -driver.R().second, .75 + (driver.LT() * .25));
 			shadow::gwrite(operat.LT() > .1);
 			shadow::swrite(operat.RT() > .1);
 
@@ -87,6 +87,7 @@ public:
 		t.Start();
 		drivetrain::retract_versa();
 		//shadow::run(this);
+		std::cout << "" << std::endl;
 		autonomous::auto1(this);
 		autonomous::auto2(this);
 		autonomous::auto3(this);
