@@ -8,6 +8,8 @@
 #ifndef SRC_GEAR_H_
 #define SRC_GEAR_H_
 
+#define WAIT_DROPOFF_GEAR 0.4 //Seconds to wait before moving away from peg
+
 namespace gear {
 void open();
 void stop();

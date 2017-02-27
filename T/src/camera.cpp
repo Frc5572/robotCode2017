@@ -5,7 +5,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 
-cs::UsbCamera uc;
+cs::UsbCamera uc; //Front
 cs::UsbCamera bc;
 cs::CvSource outputStream;
 

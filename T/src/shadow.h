@@ -1,7 +1,8 @@
 #ifndef SRC_SHADOW_H_
 #define SRC_SHADOW_H_
-
+#include <I2C.h>
 #include <RobotBase.h>
+
 
 namespace shadow {
 void init();

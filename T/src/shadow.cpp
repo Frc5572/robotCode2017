@@ -72,8 +72,8 @@ void shadow::dtwrite(double a, double b, double c) {
 	}
 }
 
-void shadow::swrite(bool b) {
-	if (b) {
+void shadow::swrite(bool RTisPressed) {
+	if (RTisPressed) {
 		shooter::shoot();
 	} else {
 		shooter::stop();
@@ -81,7 +81,7 @@ void shadow::swrite(bool b) {
 	if (writing) {
 		write(fd, (const void*) S_ID, 1);
 		write(fd, dtob(clock_.Get()), sizeof(clock_.Get()));
-		write(fd, (const void*) (b), sizeof(bool));
+		write(fd, (const void*) (RTisPressed), sizeof(bool));
 	}
 }
 

@@ -3,6 +3,7 @@
 	<name>T</name>
 	<comment></comment>
 	<projects>
+		<project>T</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
